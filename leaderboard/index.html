@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>98th Academy Awards — Live Leaderboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --gold:#C9A84C; --gold-light:#E8C97A; --gold-dark:#8B6914; --cream:#FAF6EE; --bg:#0E0B05; --card:#1C1608; --border:rgba(201,168,76,0.22); --border-bright:rgba(201,168,76,0.7); --green:#4CAF7A; --green-dim:rgba(76,175,122,0.12); --red-dim:rgba(207,102,121,0.1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--cream); font-family:'Cormorant Garamond',serif; min-height:100vh; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:9999; opacity:0.35; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); }
+  .hero { text-align:center; padding:52px 24px 36px; border-bottom:1px solid var(--border); }
+  .live-badge { display:inline-flex; align-items:center; gap:7px; font-family:'Montserrat',sans-serif; font-size:9px; font-weight:600; letter-spacing:0.35em; text-transform:uppercase; color:var(--green); background:rgba(76,175,122,0.1); border:1px solid rgba(76,175,122,0.3); padding:5px 14px; border-radius:20px; margin-bottom:18px; }
+  .live-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:blink 1.2s ease infinite; }
+  .hero h1 { font-family:'Playfair Display',serif; font-size:clamp(38px,6vw,74px); font-weight:900; color:var(--gold-light); line-height:0.95; text-shadow:0 0 60px rgba(201,168,76,0.25); }
+  .hero h1 em { font-style:italic; color:var(--cream); display:block; font-size:0.55em; font-weight:400; letter-spacing:0.06em; margin-top:6px; }
+  .divider { display:flex; align-items:center; justify-content:center; gap:14px; margin:14px auto; max-width:260px; }
+  .divider::before,.divider::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--gold-dark),transparent); }
+  .divider span { color:var(--gold); font-size:14px; }
+  .cats-bar { font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:0.25em; color:rgba(250,246,238,0.4); margin-top:6px; }
+  .container { max-width:860px; margin:0 auto; padding:40px 24px 80px; }
+  .section-label { font-family:'Montserrat',sans-serif; font-size:9px; letter-spacing:0.45em; text-transform:uppercase; color:var(--gold); margin-bottom:18px; display:flex; align-items:center; gap:14px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+  .podium { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:32px; align-items:end; }
+  .podium-card { background:var(--card); border:1px solid var(--border); border-radius:2px; padding:20px 14px 16px; text-align:center; }
+  .podium-card.first { border-color:var(--border-bright); padding-top:30px; background:linear-gradient(180deg,rgba(201,168,76,0.08) 0%,var(--card) 100%); }
+  .podium-medal { font-size:26px; margin-bottom:6px; }
+  .podium-rank { font-family:'Montserrat',sans-serif; font-size:8px; letter-spacing:0.3em; color:var(--gold); text-transform:uppercase; margin-bottom:5px; }
+  .podium-name { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; margin-bottom:6px; min-height:24px; }
+  .podium-score { font-family:'Playfair Display',serif; font-size:34px; font-weight:900; color:var(--gold-light); line-height:1; }
+  .podium-score span { font-size:12px; font-weight:400; color:rgba(250,246,238,0.35); }
+  .lb-table { width:100%; border-collapse:collapse; }
+  .lb-table th { font-family:'Montserrat',sans-serif; font-size:8px; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); padding:8px 14px; text-align:left; border-bottom:1px solid var(--border); }
+  .lb-row { cursor:pointer; }
+  .lb-row:hover td { background:rgba(201,168,76,0.04); }
+  .lb-row td { padding:13px 14px; border-bottom:1px solid rgba(201,168,76,0.08); }
+  .lb-row.flash td { animation:flash-row 1s ease; }
+  .lb-num { font-family:'Montserrat',sans-serif; font-size:12px; color:var(--gold-dark); width:32px; }
+  .lb-name-cell { font-family:'Playfair Display',serif; font-size:19px; }
+  .lb-score-cell { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--gold-light); text-align:right; }
+  .lb-correct-cell { font-family:'Montserrat',sans-serif; font-size:10px; color:var(--green); text-align:right; white-space:nowrap; }
+  .lb-chev { color:var(--gold-dark); text-align:center; width:28px; font-size:13px; transition:transform 0.3s; }
+  .lb-chev.open { transform:rotate(180deg); }
+  .lb-detail-row { display:none; }
+  .lb-detail-row.open { display:table-row; }
+  .lb-detail-cell { padding:4px 14px 16px !important; border-bottom:1px solid var(--border) !important; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; padding-top:8px; }
+  .chip { font-size:13px; padding:4px 11px; border-radius:20px; display:flex; align-items:center; gap:5px; }
+  .chip.correct { background:var(--green-dim); border:1px solid rgba(76,175,122,0.3); color:var(--green); }
+  .chip.wrong { background:var(--red-dim); border:1px solid rgba(207,102,121,0.2); color:rgba(250,246,238,0.45); }
+  .chip.pending { background:rgba(201,168,76,0.05); border:1px solid rgba(201,168,76,0.15); color:rgba(250,246,238,0.3); font-style:italic; }
+  .chip-pts { font-family:'Montserrat',sans-serif; font-size:9px; font-weight:600; }
+  .loading { text-align:center; padding:80px 24px; font-style:italic; color:rgba(250,246,238,0.3); font-size:18px; }
+  .spinner { width:36px; height:36px; border:2px solid rgba(201,168,76,0.15); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 20px; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  @keyframes flash-row { 0%{background:rgba(201,168,76,0.18)} 100%{background:transparent} }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:3px}
+  @media(max-width:580px){.podium{grid-template-columns:1fr}.podium-card.first{order:-1}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div><span class="live-badge"><span class="live-dot"></span>Live</span></div>
+  <h1>98th Oscars<em>Live Leaderboard</em></h1>
+  <div class="divider"><span>✦</span></div>
+  <div class="cats-bar" id="catsBar">Connecting…</div>
+</header>
+<div class="container">
+  <div id="loadingDiv" class="loading"><div class="spinner"></div>Loading picks…</div>
+  <div id="mainContent" style="display:none">
+    <div class="section-label">Top 3</div>
+    <div class="podium">
+      <div class="podium-card"><div class="podium-medal">🥈</div><div class="podium-rank">2nd Place</div><div class="podium-name" id="p2n">—</div><div class="podium-score" id="p2s">0 <span>pts</span></div></div>
+      <div class="podium-card first"><div class="podium-medal">🥇</div><div class="podium-rank">1st Place</div><div class="podium-name" id="p1n">—</div><div class="podium-score" id="p1s">0 <span>pts</span></div></div>
+      <div class="podium-card"><div class="podium-medal">🥉</div><div class="podium-rank">3rd Place</div><div class="podium-name" id="p3n">—</div><div class="podium-score" id="p3s">0 <span>pts</span></div></div>
+    </div>
+    <div class="section-label">Full Rankings</div>
+    <table class="lb-table">
+      <thead><tr><th>#</th><th>Name</th><th style="text-align:right">Score</th><th style="text-align:right">Correct</th><th></th></tr></thead>
+      <tbody id="lbBody"></tbody>
+    </table>
+  </div>
+</div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  const firebaseConfig = { apiKey:"AIzaSyDRKImJEoTBq9_bDUrzqoZ5y0JYzTOTdxo", authDomain:"oscars-541a6.firebaseapp.com", projectId:"oscars-541a6", storageBucket:"oscars-541a6.firebasestorage.app", messagingSenderId:"513699366007", appId:"1:513699366007:web:229d19b0639257e8023272" };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const ALL_CATEGORIES = [
+    {id:"bestPicture",name:"Best Picture",pts:15,type:"major"},
+    {id:"bestDirector",name:"Best Director",pts:12,type:"major"},
+    {id:"bestActor",name:"Best Actor",pts:10,type:"major"},
+    {id:"bestActress",name:"Best Actress",pts:10,type:"major"},
+    {id:"bestSupportingActor",name:"Best Supporting Actor",pts:8,type:"major"},
+    {id:"bestSupportingActress",name:"Best Supporting Actress",pts:8,type:"major"},
+    {id:"bestCasting",name:"Best Casting",pts:10,type:"special"},
+    {id:"bestCinematography",name:"Best Cinematography",type:"tech"},
+    {id:"bestFilmEditing",name:"Best Film Editing",type:"tech"},
+    {id:"bestProductionDesign",name:"Best Production Design",type:"tech"},
+    {id:"bestCostumeDesign",name:"Best Costume Design",type:"tech"},
+    {id:"bestMakeup",name:"Best Makeup & Hairstyling",type:"tech"},
+    {id:"bestScore",name:"Best Original Score",type:"tech"},
+    {id:"bestSong",name:"Best Original Song",type:"tech"},
+    {id:"bestSound",name:"Best Sound",type:"tech"},
+    {id:"bestAnimatedFeature",name:"Best Animated Feature",type:"tech"},
+    {id:"bestInternational",name:"Best International Feature",type:"tech"},
+    {id:"bestDocumentary",name:"Best Documentary Feature",type:"tech"}
+  ];
+  let allPicks=[], currentWinners={}, expandedRows={}, prevScores={};
+  async function boot() {
+    const snap = await getDocs(collection(db,"oscar_picks"));
+    snap.forEach(d => allPicks.push({id:d.id,...d.data()}));
+    document.getElementById('loadingDiv').style.display='none';
+    document.getElementById('mainContent').style.display='block';
+    onSnapshot(doc(db,"live_winners","current"), docSnap => {
+      currentWinners = docSnap.exists() ? docSnap.data() : {};
+      render();
+    });
+  }
+  boot().catch(err => { document.getElementById('loadingDiv').innerHTML='<p style="color:#E88">Error: '+err.message+'</p>'; });
+  function scorePlayer(pick) {
+    let total=0, correct=0;
+    const breakdown=[];
+    ALL_CATEGORIES.forEach(cat => {
+      let playerPick=null, maxPts=0;
+      if(cat.type==='major'){playerPick=(pick.majorPicks||{})[cat.id]||null; maxPts=cat.pts;}
+      else if(cat.type==='special'){playerPick=pick.specialPick||null; maxPts=10;}
+      else{const tp=(pick.techPicks||{})[cat.id]; if(tp){playerPick=tp.nominee||null; maxPts=parseInt(tp.points||0);}}
+      const winner=currentWinners[cat.id]||null;
+      const announced=!!winner;
+      const isCorrect=announced&&playerPick&&playerPick.toLowerCase().trim()===winner.toLowerCase().trim();
+      const earned=isCorrect?maxPts:0;
+      if(isCorrect){total+=maxPts;correct++;}
+      breakdown.push({catName:cat.name,playerPick,winner,announced,isCorrect,earned});
+    });
+    return {name:pick.name||'Unknown',total,correct,breakdown};
+  }
+  function render() {
+    const scored=allPicks.map(p=>scorePlayer(p)).sort((a,b)=>b.total-a.total);
+    const announced=ALL_CATEGORIES.filter(c=>currentWinners[c.id]).length;
+    document.getElementById('catsBar').textContent=
+      announced===0?'Waiting for first winner…':
+      announced===ALL_CATEGORIES.length?`All ${ALL_CATEGORIES.length} categories announced ✦`:
+      `${announced} of ${ALL_CATEGORIES.length} categories announced`;
+    [{nid:'p1n',sid:'p1s',i:0},{nid:'p2n',sid:'p2s',i:1},{nid:'p3n',sid:'p3s',i:2}].forEach(p=>{
+      const s=scored[p.i];
+      document.getElementById(p.nid).textContent=s?s.name:'—';
+      document.getElementById(p.sid).innerHTML=s?`${s.total} <span>pts</span>`:`0 <span>pts</span>`;
+    });
+    const tbody=document.getElementById('lbBody');
+    tbody.innerHTML='';
+    scored.forEach((s,i)=>{
+      const changed=prevScores[s.name]!==undefined&&prevScores[s.name]!==s.total;
+      const sid=s.name.replace(/[^a-z0-9]/gi,'_');
+      const tr=document.createElement('tr');
+      tr.className='lb-row'+(changed?' flash':'');
+      tr.onclick=()=>toggleDetail(sid);
+      tr.innerHTML=`<td class="lb-num">${i+1}</td><td class="lb-name-cell">${s.name}</td><td class="lb-score-cell">${s.total}</td><td class="lb-correct-cell">${s.correct}/${announced} ✓</td><td class="lb-chev ${expandedRows[sid]?'open':''}" id="chev-${sid}">▼</td>`;
+      tbody.appendChild(tr);
+      const dtr=document.createElement('tr');
+      dtr.className='lb-detail-row'+(expandedRows[sid]?' open':'');
+      dtr.id='det-'+sid;
+      const dtd=document.createElement('td');
+      dtd.className='lb-detail-cell';
+      dtd.colSpan=5;
+      dtd.innerHTML=buildChips(s.breakdown);
+      dtr.appendChild(dtd);
+      tbody.appendChild(dtr);
+      prevScores[s.name]=s.total;
+    });
+  }
+  function toggleDetail(sid){
+    expandedRows[sid]=!expandedRows[sid];
+    const row=document.getElementById('det-'+sid);
+    const chev=document.getElementById('chev-'+sid);
+    if(row)row.classList.toggle('open',expandedRows[sid]);
+    if(chev)chev.classList.toggle('open',expandedRows[sid]);
+  }
+  function buildChips(breakdown){
+    let html='<div class="chips">';
+    breakdown.forEach(item=>{
+      if(!item.announced&&!item.playerPick)return;
+      const cls=!item.announced?'pending':item.isCorrect?'correct':'wrong';
+      const icon=!item.announced?'?':item.isCorrect?'✓':'✗';
+      html+=`<div class="chip ${cls}">${icon} ${item.playerPick||'(no pick)'}${item.earned>0?`<span class="chip-pts">+${item.earned}</span>`:''}</div>`;
+    });
+    return html+'</div>';
+  }
+</script>
+</body>
+</html>
