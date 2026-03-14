@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>98th Academy Awards — Oscar Picks</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C; --gold-light: #E8C97A; --gold-dark: #8B6914;
+    --cream: #FAF6EE; --ink: #1A1408; --bg: #0E0B05; --card: #1C1608;
+    --border: rgba(201,168,76,0.25); --border-bright: rgba(201,168,76,0.7);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--cream); font-family: 'Cormorant Garamond', serif; min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+  .hero { text-align: center; padding: 70px 24px 50px; position: relative; border-bottom: 1px solid var(--border); }
+  .hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 1px; height: 40px; background: linear-gradient(to bottom, transparent, var(--gold)); }
+  .hero-eyebrow { font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.4em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 7vw, 82px); font-weight: 900; line-height: 0.95; color: var(--gold-light); text-shadow: 0 0 60px rgba(201,168,76,0.3); }
+  .hero h1 em { font-style: italic; color: var(--cream); display: block; font-size: 0.65em; font-weight: 400; letter-spacing: 0.05em; margin-top: 4px; }
+  .hero-sub { font-size: 17px; color: rgba(250,246,238,0.55); margin-top: 18px; font-style: italic; letter-spacing: 0.03em; }
+  .divider-ornament { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 20px auto; max-width: 300px; }
+  .divider-ornament::before, .divider-ornament::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--gold-dark), transparent); }
+  .divider-ornament span { color: var(--gold); font-size: 18px; }
+  .container { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; }
+  .name-step { text-align: center; padding: 50px 0 10px; animation: fadeUp 0.6s ease forwards; }
+  .name-step h2 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 400; color: var(--gold-light); margin-bottom: 8px; }
+  .name-step p { font-size: 16px; color: rgba(250,246,238,0.5); font-style: italic; margin-bottom: 32px; }
+  .name-input-wrap { position: relative; display: inline-block; width: 100%; max-width: 400px; }
+  .name-input-wrap input { width: 100%; background: transparent; border: none; border-bottom: 2px solid var(--gold-dark); color: var(--cream); font-family: 'Playfair Display', serif; font-size: 28px; font-style: italic; text-align: center; padding: 10px 0; outline: none; transition: border-color 0.3s; }
+  .name-input-wrap input:focus { border-bottom-color: var(--gold); }
+  .name-input-wrap input::placeholder { color: rgba(250,246,238,0.2); }
+  .progress-bar-wrap { position: sticky; top: 0; z-index: 100; background: rgba(14,11,5,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 12px 24px; display: none; }
+  .progress-bar-wrap.visible { display: block; }
+  .progress-info { display: flex; justify-content: space-between; align-items: center; max-width: 860px; margin: 0 auto; }
+  .progress-name { font-family: 'Playfair Display', serif; font-size: 16px; font-style: italic; color: var(--gold-light); }
+  .progress-count { font-family: 'Montserrat', sans-serif; font-size: 11px; letter-spacing: 0.2em; color: var(--gold); }
+  .progress-track { height: 2px; background: rgba(201,168,76,0.15); border-radius: 2px; margin-top: 8px; max-width: 860px; margin-left: auto; margin-right: auto; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(to right, var(--gold-dark), var(--gold-light)); border-radius: 2px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); width: 0%; }
+  .section-label { font-family: 'Montserrat', sans-serif; font-size: 9px; letter-spacing: 0.5em; text-transform: uppercase; color: var(--gold); margin: 60px 0 24px; display: flex; align-items: center; gap: 16px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .category-card { background: var(--card); border: 1px solid var(--border); border-radius: 2px; margin-bottom: 20px; overflow: hidden; transition: border-color 0.3s; animation: fadeUp 0.5s ease forwards; opacity: 0; }
+  .category-card.selected { border-color: var(--border-bright); }
+  .category-card:nth-child(1){animation-delay:0.05s} .category-card:nth-child(2){animation-delay:0.1s} .category-card:nth-child(3){animation-delay:0.15s} .category-card:nth-child(4){animation-delay:0.2s} .category-card:nth-child(5){animation-delay:0.25s} .category-card:nth-child(6){animation-delay:0.3s} .category-card:nth-child(7){animation-delay:0.35s} .category-card:nth-child(8){animation-delay:0.4s}
+  .cat-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px 14px; border-bottom: 1px solid var(--border); }
+  .cat-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--cream); }
+  .cat-points { font-family: 'Montserrat', sans-serif; font-size: 10px; letter-spacing: 0.25em; color: var(--gold); background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3); padding: 4px 12px; border-radius: 20px; }
+  .cat-selected-display { padding: 6px 22px 14px; font-family: 'Cormorant Garamond', serif; font-size: 14px; font-style: italic; color: var(--gold-light); min-height: 30px; }
+  .nominees-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1px; background: var(--border); }
+  .nominee-btn { background: var(--card); border: none; color: var(--cream); font-family: 'Cormorant Garamond', serif; font-size: 15px; padding: 13px 16px; text-align: left; cursor: pointer; transition: background 0.2s, color 0.2s; line-height: 1.35; position: relative; }
+  .nominee-btn:hover { background: rgba(201,168,76,0.08); }
+  .nominee-btn.chosen { background: rgba(201,168,76,0.15); color: var(--gold-light); }
+  .nominee-btn.chosen::after { content: '✦'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 12px; }
+  .nominee-film { display: block; font-size: 12px; font-style: italic; color: rgba(250,246,238,0.4); margin-top: 2px; }
+  .nominee-btn.chosen .nominee-film { color: rgba(201,168,76,0.6); }
+  .tech-intro { background: rgba(201,168,76,0.05); border: 1px solid var(--border); border-radius: 2px; padding: 20px 24px; margin-bottom: 24px; font-size: 15px; color: rgba(250,246,238,0.7); font-style: italic; line-height: 1.7; }
+  .tech-intro strong { color: var(--gold-light); font-style: normal; }
+  .tech-points-display { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .point-chip { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); background: rgba(201,168,76,0.08); color: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+  .point-chip.used { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+  .tech-cat-card { background: var(--card); border: 1px solid var(--border); border-radius: 2px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.3s; }
+  .tech-cat-card.selected-tech { border-color: var(--border-bright); }
+  .tech-cat-header { display: flex; align-items: center; gap: 14px; padding: 16px 18px; cursor: pointer; transition: background 0.2s; }
+  .tech-cat-header:hover { background: rgba(201,168,76,0.04); }
+  .tech-cat-name { font-family: 'Playfair Display', serif; font-size: 18px; flex: 1; }
+  .tech-point-selector { display: flex; gap: 4px; }
+  .tpt-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(201,168,76,0.25); background: transparent; color: rgba(250,246,238,0.4); font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .tpt-btn:hover:not(.disabled-pt) { border-color: var(--gold); color: var(--gold); }
+  .tpt-btn.active-pt { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+  .tpt-btn.disabled-pt { opacity: 0.2; cursor: not-allowed; }
+  .tech-nominees { background: var(--border); display: none; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1px; }
+  .tech-nominees.open { display: grid; }
+  .cat-selected-display-tech { padding: 4px 18px 10px; font-size: 13px; font-style: italic; color: var(--gold-light); display: none; }
+  .btn { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase; border: none; cursor: pointer; padding: 14px 40px; border-radius: 2px; transition: all 0.3s; }
+  .btn-gold { background: var(--gold); color: var(--ink); }
+  .btn-gold:hover { background: var(--gold-light); box-shadow: 0 4px 20px rgba(201,168,76,0.35); transform: translateY(-1px); }
+  .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-outline { background: transparent; color: var(--gold); border: 1px solid var(--gold-dark); }
+  .btn-outline:hover { border-color: var(--gold); background: rgba(201,168,76,0.06); }
+  .submit-row { text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--border); }
+  .submit-row p { font-size: 14px; color: rgba(250,246,238,0.4); font-style: italic; margin-top: 14px; }
+  .error-box { background: rgba(139,26,26,0.15); border: 1px solid rgba(139,26,26,0.4); color: #E88; font-size: 14px; padding: 14px 20px; border-radius: 2px; margin-top: 16px; display: none; line-height: 1.6; }
+  .error-box.visible { display: block; }
+  .success-screen { display: none; text-align: center; padding: 80px 24px; animation: fadeUp 0.8s ease forwards; }
+  .success-screen.visible { display: block; }
+  .success-icon { font-size: 64px; color: var(--gold); margin-bottom: 24px; animation: pulse 2s ease infinite; }
+  .success-screen h2 { font-family: 'Playfair Display', serif; font-size: 42px; color: var(--gold-light); margin-bottom: 12px; }
+  .success-screen p { font-size: 18px; color: rgba(250,246,238,0.6); font-style: italic; margin-bottom: 32px; }
+  .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(14,11,5,0.85); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; gap: 20px; }
+  .loading-overlay.visible { display: flex; }
+  .spinner { width: 48px; height: 48px; border: 3px solid rgba(201,168,76,0.2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  .loading-text { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; color: var(--gold-light); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.08);opacity:0.8} }
+  .hidden { display: none !important; }
+  .picks-section { display: none; }
+  .picks-section.visible { display: block; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+  @media (max-width: 600px) { .nominees-grid { grid-template-columns: 1fr; } .tech-point-selector { gap: 2px; } .tpt-btn { width: 22px; height: 22px; font-size: 9px; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-eyebrow">98th Academy Awards</div>
+  <h1>Oscar<em>Predictions</em></h1>
+  <div class="divider-ornament"><span>✦</span></div>
+  <div class="hero-sub">Submit your picks before 6pm Sunday</div>
+</header>
+
+<div class="progress-bar-wrap" id="progressBar">
+  <div class="progress-info">
+    <span class="progress-name" id="progressName"></span>
+    <span class="progress-count" id="progressCount"></span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Submitting your picks to the Academy…</div>
+</div>
+
+<div class="container">
+  <div class="name-step" id="nameStep">
+    <h2>Who's predicting?</h2>
+    <p>Enter your name to begin</p>
+    <div class="name-input-wrap">
+      <input type="text" id="nameInput" placeholder="Your name" autocomplete="off" autofocus>
+    </div>
+    <br><br>
+    <button class="btn btn-gold" onclick="startPicking()">Begin Picking →</button>
+  </div>
+
+  <div class="picks-section" id="picksSection">
+    <div class="section-label">Major Categories</div>
+    <div id="majorCategories"></div>
+    <div class="section-label">Special Category — New This Year</div>
+    <div id="specialCategory"></div>
+    <div class="section-label">Technical &amp; Craft — Choose 8</div>
+    <div class="tech-intro">
+      Select exactly <strong>8 categories</strong> and assign each a unique point value from <strong>1–8</strong>. No two categories can share the same point value.
+    </div>
+    <div class="tech-points-display" id="pointChips"></div>
+    <div id="techCategories"></div>
+    <div class="submit-row">
+      <button class="btn btn-gold" onclick="submitPicks()">Submit My Picks ✦</button>
+      <div class="error-box" id="errorBox"></div>
+      <p>All major categories + 8 technical must be completed</p>
+    </div>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✦</div>
+    <h2>Picks Submitted!</h2>
+    <p id="successName"></p>
+    <button class="btn btn-outline" style="margin-top:10px" onclick="resetForNextPerson()">Submit Another Person's Picks</button>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyDRKImJEoTBq9_bDUrzqoZ5y0JYzTOTdxo",
+    authDomain: "oscars-541a6.firebaseapp.com",
+    projectId: "oscars-541a6",
+    storageBucket: "oscars-541a6.firebasestorage.app",
+    messagingSenderId: "513699366007",
+    appId: "1:513699366007:web:229d19b0639257e8023272"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window._saveToFirebase = async function(data) {
+    const docRef = await addDoc(collection(db, "oscar_picks"), { ...data, timestamp: serverTimestamp() });
+    return docRef.id;
+  };
+</script>
+
+<script>
+const MAJOR_CATEGORIES = [
+  { id:"bestPicture", name:"Best Picture", points:15, nominees:[{name:"Bugonia"},{name:"F1"},{name:"Frankenstein"},{name:"Hamnet"},{name:"Marty Supreme"},{name:"One Battle After Another"},{name:"The Secret Agent"},{name:"Sentimental Value"},{name:"Sinners"},{name:"Train Dreams"}] },
+  { id:"bestDirector", name:"Best Director", points:12, nominees:[{name:"Chloé Zhao",film:"Hamnet"},{name:"Josh Safdie",film:"Marty Supreme"},{name:"Paul Thomas Anderson",film:"One Battle After Another"},{name:"Joachim Trier",film:"Sentimental Value"},{name:"Ryan Coogler",film:"Sinners"}] },
+  { id:"bestActor", name:"Best Actor", points:10, nominees:[{name:"Timothée Chalamet",film:"Marty Supreme"},{name:"Leonardo DiCaprio",film:"One Battle After Another"},{name:"Ethan Hawke",film:"Blue Moon"},{name:"Michael B. Jordan",film:"Sinners"},{name:"Wagner Moura",film:"The Secret Agent"}] },
+  { id:"bestActress", name:"Best Actress", points:10, nominees:[{name:"Jessie Buckley",film:"Hamnet"},{name:"Rose Byrne",film:"If I Had Legs I'd Kick You"},{name:"Kate Hudson",film:"Song Sung Blue"},{name:"Renate Reinsve",film:"Sentimental Value"},{name:"Emma Stone",film:"Bugonia"}] },
+  { id:"bestSupportingActor", name:"Best Supporting Actor", points:8, nominees:[{name:"Benicio Del Toro",film:"One Battle After Another"},{name:"Jacob Elordi",film:"Frankenstein"},{name:"Delroy Lindo",film:"Sinners"},{name:"Sean Penn",film:"One Battle After Another"},{name:"Stellan Skarsgård",film:"Sentimental Value"}] },
+  { id:"bestSupportingActress", name:"Best Supporting Actress", points:8, nominees:[{name:"Elle Fanning",film:"Sentimental Value"},{name:"Inga Ibsdotter Lilleaas",film:"Sentimental Value"},{name:"Amy Madigan",film:"Weapons"},{name:"Wunmi Mosaku",film:"Sinners"},{name:"Teyana Taylor",film:"One Battle After Another"}] }
+];
+
+const SPECIAL_CATEGORY = {
+  id:"bestCasting", name:"Best Casting ✦ New Category", points:10,
+  nominees:[{name:"Hamnet"},{name:"Marty Supreme"},{name:"One Battle After Another"},{name:"The Secret Agent"},{name:"Sinners"}]
+};
+
+const TECH_CATEGORIES = [
+  { id:"bestCinematography", name:"Best Cinematography", nominees:[{name:"Dan Laustsen",film:"Frankenstein"},{name:"Darius Khondji",film:"Marty Supreme"},{name:"Michael Bauman",film:"One Battle After Another"},{name:"Autumn Durald Arkapaw",film:"Sinners"},{name:"Adolpho Veloso",film:"Train Dreams"}] },
+  { id:"bestFilmEditing", name:"Best Film Editing", nominees:[{name:"F1"},{name:"Marty Supreme"},{name:"One Battle After Another"},{name:"Sentimental Value"},{name:"Sinners"}] },
+  { id:"bestProductionDesign", name:"Best Production Design", nominees:[{name:"Frankenstein"},{name:"Hamnet"},{name:"Marty Supreme"},{name:"One Battle After Another"},{name:"Sinners"}] },
+  { id:"bestCostumeDesign", name:"Best Costume Design", nominees:[{name:"Avatar: Fire and Ash"},{name:"Frankenstein"},{name:"Hamnet"},{name:"Marty Supreme"},{name:"Sinners"}] },
+  { id:"bestMakeup", name:"Best Makeup & Hairstyling", nominees:[{name:"Frankenstein"},{name:"Kokuho"},{name:"Sinners"},{name:"The Smashing Machine"},{name:"The Ugly Stepsister"}] },
+  { id:"bestScore", name:"Best Original Score", nominees:[{name:"Bugonia"},{name:"Frankenstein"},{name:"Hamnet"},{name:"One Battle After Another"},{name:"Sinners"}] },
+  { id:"bestSong", name:"Best Original Song", nominees:[{name:"Dear Me",film:"Diane Warren: Relentless"},{name:"Golden",film:"KPop Demon Hunters"},{name:"I Lied To You",film:"Sinners"},{name:"Sweet Dreams Of Joy",film:"Viva Verdi!"},{name:"Train Dreams",film:"Train Dreams"}] },
+  { id:"bestSound", name:"Best Sound", nominees:[{name:"F1"},{name:"Frankenstein"},{name:"One Battle After Another"},{name:"Sinners"},{name:"Sirāt"}] },
+  { id:"bestAnimatedFeature", name:"Best Animated Feature", nominees:[{name:"Arco"},{name:"Elio"},{name:"KPop Demon Hunters"},{name:"Little Amélie or the Character of Rain"},{name:"Zootopia 2"}] },
+  { id:"bestInternational", name:"Best International Feature", nominees:[{name:"The Secret Agent",film:"Brazil"},{name:"It Was Just an Accident",film:"France"},{name:"Sentimental Value",film:"Norway"},{name:"Sirāt",film:"Spain"},{name:"The Voice of Hind Rajab",film:"Tunisia"}] },
+  { id:"bestDocumentary", name:"Best Documentary Feature", nominees:[{name:"The Alabama Solution"},{name:"Come See Me in the Good Light"},{name:"Cutting Through Rocks"},{name:"Mr. Nobody Against Putin"},{name:"The Perfect Neighbor"}] }
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let currentUser = "";
+let majorPicks = {};
+let specialPick = null;
+let techPicks = {};
+let usedPoints = new Set();
+
+document.getElementById('nameInput').addEventListener('keydown', e => { if(e.key==='Enter') startPicking(); });
+
+function startPicking() {
+  const name = document.getElementById('nameInput').value.trim();
+  if (!name) { document.getElementById('nameInput').style.borderBottomColor = '#E88'; return; }
+  currentUser = name;
+  document.getElementById('nameStep').classList.add('hidden');
+  document.getElementById('picksSection').classList.add('visible');
+  document.getElementById('progressBar').classList.add('visible');
+  document.getElementById('progressName').textContent = name + "'s Picks";
+  renderMajorCategories();
+  renderSpecialCategory();
+  renderTechCategories();
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderMajorCategories() {
+  const container = document.getElementById('majorCategories');
+  container.innerHTML = '';
+  MAJOR_CATEGORIES.forEach(cat => container.appendChild(buildCategoryCard(cat, 'major')));
+}
+
+function renderSpecialCategory() {
+  const container = document.getElementById('specialCategory');
+  container.innerHTML = '';
+  container.appendChild(buildCategoryCard(SPECIAL_CATEGORY, 'special'));
+}
+
+function buildCategoryCard(cat, type) {
+  const card = document.createElement('div');
+  card.className = 'category-card';
+  card.id = 'card-' + cat.id;
+  const header = document.createElement('div');
+  header.className = 'cat-header';
+  header.innerHTML = `<span class="cat-title">${cat.name}</span><span class="cat-points">${cat.points} pts</span>`;
+  card.appendChild(header);
+  const selected = document.createElement('div');
+  selected.className = 'cat-selected-display';
+  selected.id = 'sel-' + cat.id;
+  selected.textContent = '— no pick yet —';
+  card.appendChild(selected);
+  const grid = document.createElement('div');
+  grid.className = 'nominees-grid';
+  cat.nominees.forEach(nom => {
+    const btn = document.createElement('button');
+    btn.className = 'nominee-btn';
+    btn.dataset.catId = cat.id;
+    btn.dataset.type = type;
+    btn.innerHTML = `${nom.name}${nom.film ? `<span class="nominee-film">${nom.film}</span>` : ''}`;
+    btn.id = `nom-${cat.id}-${nom.name.replace(/[^a-z0-9]/gi,'_')}`;
+    btn.onclick = () => selectNominee(cat.id, nom.name, type);
+    grid.appendChild(btn);
+  });
+  card.appendChild(grid);
+  return card;
+}
+
+function selectNominee(catId, nomName, type) {
+  document.querySelectorAll(`[data-cat-id="${catId}"]`).forEach(b => b.classList.remove('chosen'));
+  const btn = document.getElementById(`nom-${catId}-${nomName.replace(/[^a-z0-9]/gi,'_')}`);
+  if (btn) btn.classList.add('chosen');
+  if (type === 'major') majorPicks[catId] = nomName;
+  else if (type === 'special') specialPick = nomName;
+  const sel = document.getElementById('sel-' + catId);
+  if (sel) sel.textContent = '✦ ' + nomName;
+  const card = document.getElementById('card-' + catId);
+  if (card) card.classList.add('selected');
+  updateProgress();
+  clearError();
+}
+
+function renderTechCategories() {
+  const container = document.getElementById('techCategories');
+  container.innerHTML = '';
+  renderPointChips();
+  TECH_CATEGORIES.forEach(cat => {
+    const card = document.createElement('div');
+    card.className = 'tech-cat-card';
+    card.id = 'tcard-' + cat.id;
+    const header = document.createElement('div');
+    header.className = 'tech-cat-header';
+    header.onclick = () => toggleTechExpand(cat.id);
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'tech-cat-name';
+    nameSpan.textContent = cat.name;
+    const pointSel = document.createElement('div');
+    pointSel.className = 'tech-point-selector';
+    pointSel.id = 'pts-' + cat.id;
+    for (let p = 1; p <= 8; p++) {
+      const btn = document.createElement('button');
+      btn.className = 'tpt-btn';
+      btn.textContent = p;
+      btn.dataset.point = p;
+      btn.dataset.catId = cat.id;
+      btn.onclick = (e) => { e.stopPropagation(); assignPoint(cat.id, p); };
+      pointSel.appendChild(btn);
+    }
+    header.appendChild(nameSpan);
+    header.appendChild(pointSel);
+    card.appendChild(header);
+    const selDisp = document.createElement('div');
+    selDisp.className = 'cat-selected-display-tech';
+    selDisp.id = 'tsel-' + cat.id;
+    card.appendChild(selDisp);
+    const grid = document.createElement('div');
+    grid.className = 'tech-nominees';
+    grid.id = 'tnom-' + cat.id;
+    cat.nominees.forEach(nom => {
+      const btn = document.createElement('button');
+      btn.className = 'nominee-btn';
+      btn.innerHTML = `${nom.name}${nom.film ? `<span class="nominee-film">${nom.film}</span>` : ''}`;
+      btn.id = `tnom-${cat.id}-${nom.name.replace(/[^a-z0-9]/gi,'_')}`;
+      btn.onclick = () => selectTechNominee(cat.id, nom.name);
+      grid.appendChild(btn);
+    });
+    card.appendChild(grid);
+    container.appendChild(card);
+  });
+  updatePointButtonStates();
+}
+
+function renderPointChips() {
+  const container = document.getElementById('pointChips');
+  container.innerHTML = '';
+  for (let p = 1; p <= 8; p++) {
+    const chip = document.createElement('div');
+    chip.className = 'point-chip' + (usedPoints.has(p) ? ' used' : '');
+    chip.id = 'chip-' + p;
+    chip.textContent = p;
+    container.appendChild(chip);
+  }
+}
+
+function toggleTechExpand(catId) {
+  const grid = document.getElementById('tnom-' + catId);
+  const isOpen = grid.classList.contains('open');
+  document.querySelectorAll('.tech-nominees').forEach(g => g.classList.remove('open'));
+  if (!isOpen) grid.classList.add('open');
+}
+
+function assignPoint(catId, point) {
+  if (techPicks[catId] && techPicks[catId].points === point) {
+    usedPoints.delete(point);
+    delete techPicks[catId];
+    updatePointButtonStates(); updateTechCardUI(catId); renderPointChips(); updateProgress();
+    return;
+  }
+  if (usedPoints.has(point)) {
+    for (const [id, pick] of Object.entries(techPicks)) {
+      if (pick.points === point) { usedPoints.delete(point); delete techPicks[id]; updateTechCardUI(id); break; }
+    }
+  }
+  if (techPicks[catId]) usedPoints.delete(techPicks[catId].points);
+  if (!techPicks[catId]) techPicks[catId] = { nominee: null, points: null };
+  techPicks[catId].points = point;
+  usedPoints.add(point);
+  updatePointButtonStates(); updateTechCardUI(catId); renderPointChips(); updateProgress();
+  if (!techPicks[catId].nominee) {
+    const grid = document.getElementById('tnom-' + catId);
+    if (!grid.classList.contains('open')) toggleTechExpand(catId);
+  }
+  clearError();
+}
+
+function selectTechNominee(catId, nomName) {
+  const grid = document.getElementById('tnom-' + catId);
+  grid.querySelectorAll('.nominee-btn').forEach(b => b.classList.remove('chosen'));
+  const btn = document.getElementById(`tnom-${catId}-${nomName.replace(/[^a-z0-9]/gi,'_')}`);
+  if (btn) btn.classList.add('chosen');
+  if (!techPicks[catId]) techPicks[catId] = { nominee: null, points: null };
+  techPicks[catId].nominee = nomName;
+  updateTechCardUI(catId); updateProgress(); clearError();
+}
+
+function updateTechCardUI(catId) {
+  const card = document.getElementById('tcard-' + catId);
+  const selDisp = document.getElementById('tsel-' + catId);
+  const pick = techPicks[catId];
+  const ptSel = document.getElementById('pts-' + catId);
+  if (ptSel) ptSel.querySelectorAll('.tpt-btn').forEach(b => b.classList.toggle('active-pt', pick && pick.points === parseInt(b.dataset.point)));
+  if (pick && (pick.nominee || pick.points)) {
+    selDisp.style.display = 'block';
+    const parts = [];
+    if (pick.points) parts.push(`${pick.points} pts`);
+    if (pick.nominee) parts.push('→ ' + pick.nominee);
+    selDisp.textContent = parts.join('   ');
+    card.classList.add('selected-tech');
+  } else {
+    selDisp.style.display = 'none';
+    card.classList.remove('selected-tech');
+  }
+}
+
+function updatePointButtonStates() {
+  document.querySelectorAll('.tpt-btn').forEach(btn => {
+    const p = parseInt(btn.dataset.point);
+    const catId = btn.dataset.catId;
+    const takenByOther = usedPoints.has(p) && !(techPicks[catId] && techPicks[catId].points === p);
+    btn.classList.toggle('disabled-pt', takenByOther);
+  });
+}
+
+function updateProgress() {
+  const majorDone = Object.keys(majorPicks).length;
+  const specialDone = specialPick ? 1 : 0;
+  const techFull = Object.values(techPicks).filter(p => p.nominee && p.points).length;
+  const total = MAJOR_CATEGORIES.length + 1 + 8;
+  const done = majorDone + specialDone + Math.min(techFull, 8);
+  document.getElementById('progressFill').style.width = Math.round((done / total) * 100) + '%';
+  document.getElementById('progressCount').textContent = `${done} / ${total} completed`;
+}
+
+async function submitPicks() {
+  const errors = [];
+  MAJOR_CATEGORIES.forEach(cat => { if (!majorPicks[cat.id]) errors.push(`Missing pick: ${cat.name}`); });
+  if (!specialPick) errors.push('Missing pick: Best Casting');
+  const fullTech = Object.entries(techPicks).filter(([,p]) => p.nominee && p.points);
+  if (fullTech.length < 8) errors.push(`Technical categories: need 8 complete picks. You have ${fullTech.length}.`);
+  if (errors.length) {
+    const errBox = document.getElementById('errorBox');
+    errBox.innerHTML = '<strong>Please fix:</strong><br>' + errors.join('<br>');
+    errBox.classList.add('visible');
+    errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const techPayload = {};
+  fullTech.forEach(([id, p]) => {
+    const cat = TECH_CATEGORIES.find(c => c.id === id);
+    techPayload[id] = { category: cat.name, nominee: p.nominee, points: p.points };
+  });
+  const payload = { name: currentUser, majorPicks: { ...majorPicks }, specialPick, techPicks: techPayload, submittedAt: new Date().toISOString() };
+  document.getElementById('loadingOverlay').classList.add('visible');
+  try {
+    if (window._saveToFirebase) await window._saveToFirebase(payload);
+    else await new Promise(r => setTimeout(r, 1500));
+    document.getElementById('loadingOverlay').classList.remove('visible');
+    document.getElementById('picksSection').classList.remove('visible');
+    document.getElementById('progressBar').classList.remove('visible');
+    document.getElementById('successScreen').classList.add('visible');
+    document.getElementById('successName').textContent = `${currentUser}'s picks have been saved ✦`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch(err) {
+    document.getElementById('loadingOverlay').classList.remove('visible');
+    const errBox = document.getElementById('errorBox');
+    errBox.innerHTML = `<strong>Error saving:</strong> ${err.message}. Please try again.`;
+    errBox.classList.add('visible');
+  }
+}
+
+function resetForNextPerson() {
+  currentUser = ""; majorPicks = {}; specialPick = null; techPicks = {}; usedPoints = new Set();
+  document.getElementById('successScreen').classList.remove('visible');
+  document.getElementById('picksSection').classList.remove('visible');
+  document.getElementById('nameInput').value = '';
+  document.getElementById('nameInput').style.borderBottomColor = '';
+  document.getElementById('nameStep').classList.remove('hidden');
+  document.getElementById('errorBox').classList.remove('visible');
+  document.getElementById('progressBar').classList.remove('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(() => document.getElementById('nameInput').focus(), 300);
+}
+
+function clearError() { document.getElementById('errorBox').classList.remove('visible'); }
+
+window.startPicking = startPicking;
+window.submitPicks = submitPicks;
+window.resetForNextPerson = resetForNextPerson;
+</script>
+</body>
+</html>
